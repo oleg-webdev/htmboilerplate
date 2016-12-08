@@ -1,1 +1,1 @@
-{"version":3,"sources":[],"names":[],"mappings":"","file":"app-uglify.js","sourcesContent":[]}
+{"version":3,"sources":["script.js"],"names":["console","log"],"mappings":"AAAAA,QAAAC,IAAA","file":"app-uglify.js","sourcesContent":["console.log(\"\");"]}
