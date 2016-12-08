@@ -25,5 +25,4 @@ gulp.task('watch', function() {
 	gulp.watch(processFiles, ['aa-concat']);
 });
 
-gulp.task('default', ['aa-concat'], function() {
-});
+gulp.task('default', ['aa-concat'], function() {});
