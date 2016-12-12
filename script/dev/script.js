@@ -1,1 +1,2 @@
-console.log("sdf");
+let someParam = "lorem texts";
+console.log(someParam);

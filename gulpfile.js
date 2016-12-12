@@ -1,17 +1,18 @@
-var gulp        = require('gulp'),
-		aa_concat   = require('gulp-concat'),
-		aa_rename   = require('gulp-rename'),
-		aa_uglify   = require('gulp-uglify'),
-		sourcemaps  = require('gulp-sourcemaps'),
-		sass        = require('gulp-sass'),
-		browserSync = require('browser-sync').create();
+const gulp        = require('gulp'),
+			aa_concat   = require('gulp-concat'),
+			aa_rename   = require('gulp-rename'),
+			aa_uglify   = require('gulp-uglify'),
+			sourcemaps  = require('gulp-sourcemaps'),
+			sass        = require('gulp-sass'),
+			babel       = require('gulp-babel'),
+			browserSync = require('browser-sync').create();
 
-var devRoot = "script/dev/", prodRoot = "script/prod/";
-var processFiles = [
+const devRoot = "script/dev/", prodRoot = "script/prod/";
+const processFiles = [
 	devRoot + 'script.js'
 ];
 
-gulp.task('sass', function() {
+gulp.task('sass', () => {
 	gulp.src(['style/**/*.scss'])
 		.pipe(sourcemaps.init())
 		.pipe(sass({outputStyle: 'compressed'})
@@ -21,10 +22,13 @@ gulp.task('sass', function() {
 });
 
 // ================== Main working scope ==================
-gulp.task('aa-concat', function() {
+gulp.task('aa-concat', () => {
 
 	return gulp.src(processFiles)
 		.pipe(sourcemaps.init())
+		.pipe(babel({
+			presets: ['es2015']
+		}))
 		.pipe(aa_concat('concat.js'))
 		.pipe(gulp.dest(devRoot))
 		.pipe(aa_rename('app-uglify.js'))
@@ -34,7 +38,7 @@ gulp.task('aa-concat', function() {
 
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', () => {
 
 	browserSync.init({
 		server: {
@@ -53,5 +57,5 @@ gulp.task('watch', function() {
 
 });
 
-gulp.task('default', ['aa-concat'], function() {
+gulp.task('default', ['aa-concat'], () => {
 });
