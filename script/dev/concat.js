@@ -1,4 +1,4 @@
 "use strict";
 
-var someParam = "lorem texts";
+var someParam = "lorem text";
 console.log(someParam);

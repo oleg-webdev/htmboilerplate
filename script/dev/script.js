@@ -1,2 +1,2 @@
-let someParam = "lorem texts";
+let someParam = "lorem text";
 console.log(someParam);
