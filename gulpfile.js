@@ -1,7 +1,7 @@
 const gulp        = require('gulp'),
-			aa_concat   = require('gulp-concat'),
-			aa_rename   = require('gulp-rename'),
-			aa_uglify   = require('gulp-uglify'),
+			concat      = require('gulp-concat'),
+			rename      = require('gulp-rename'),
+			uglify      = require('gulp-uglify'),
 			rigger      = require('gulp-rigger'),
 			sourcemaps  = require('gulp-sourcemaps'),
 			sass        = require('gulp-sass'),
@@ -10,11 +10,10 @@ const gulp        = require('gulp'),
 
 const devRoot = "script/dev/", prodRoot = "script/prod/";
 
-
 const paths = {
 	htmlfiles: [
-		'rigger_tempates/*.html',
-		'rigger_tempates/template/*.html'
+		'htmlsrc/*.html',
+		'htmlsrc/template/*.html'
 	],
 	jsfiles  : [
 		devRoot + 'script.js'
@@ -38,17 +37,17 @@ gulp.task('aa-concat', () => {
 		.pipe(babel({
 			presets: ['es2015']
 		}))
-		.pipe(aa_concat('concat.js'))
+		.pipe(concat('concat.js'))
 		.pipe(gulp.dest(devRoot))
-		.pipe(aa_rename('app-uglify.js'))
-		.pipe(aa_uglify())
+		.pipe(rename('app-uglify.js'))
+		.pipe(uglify())
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(prodRoot));
 
 });
 
 gulp.task('html:build', function() {
-	gulp.src('rigger_tempates/*.html')
+	gulp.src('htmlsrc/*.html')
 		.pipe(rigger())
 		.pipe(gulp.dest("./"));
 });
@@ -61,7 +60,7 @@ gulp.task('watch', () => {
 		}
 	});
 
-	gulp.watch(paths.htmlfiles, ['html:build'])
+	gulp.watch(paths.htmlfiles, ['html:build']);
 
 	gulp.watch(['*.html'])
 		.on('change', browserSync.reload);
