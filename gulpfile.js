@@ -16,7 +16,8 @@ const paths = {
 		'htmlsrc/template/*.html'
 	],
 	jsfiles  : [
-		devRoot + 'script.js'
+		devRoot + 'partials/*.js',
+		devRoot + 'script.js',
 	]
 };
 

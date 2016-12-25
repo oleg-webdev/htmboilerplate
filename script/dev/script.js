@@ -1,2 +1,7 @@
-let someParam = "lorem text";
-console.log(someParam);
+jQuery(document).ready(function ($){
+
+	$('body').waitUntilExists(function() {
+		console.log("plugin ready...");
+	});
+
+});
