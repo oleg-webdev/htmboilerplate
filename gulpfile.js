@@ -1,78 +1,87 @@
-const gulp        = require('gulp'),
-			concat      = require('gulp-concat'),
-			rename      = require('gulp-rename'),
-			uglify      = require('gulp-uglify'),
-			rigger      = require('gulp-rigger'),
-			sourcemaps  = require('gulp-sourcemaps'),
-			sass        = require('gulp-sass'),
-			babel       = require('gulp-babel'),
-			browserSync = require('browser-sync').create();
+var gulp = require('gulp');
+var sass = require('gulp-sass');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
+var jshint = require('gulp-jshint');
+var browserSync = require('browser-sync').create();
+var uglify = require('gulp-uglify');
+var concat = require('gulp-concat');
+var rename = require('gulp-rename');
+var environments = require('gulp-environments');
 
-const devRoot = "script/dev/", prodRoot = "script/prod/";
+var development = environments.development;
+var production = environments.production;
+/** load config file based on enviroment */
+var configFile = production() ? "./src/env/prod.js" : "./src/env/dev.js";
 
-const paths = {
-	htmlfiles: [
-		'htmlsrc/*.html',
-		'htmlsrc/template/*.html'
-	],
-	jsfiles  : [
-		devRoot + 'partials/*.js',
-		devRoot + 'script.js',
-	]
-};
-
-gulp.task('sass', () => {
-	gulp.src(['style/**/*.scss'])
-		.pipe(sourcemaps.init())
-		.pipe(sass({outputStyle: 'compressed'})
-			.on('error', sass.logError))
-		.pipe(sourcemaps.write())
-		.pipe(gulp.dest('style/'));
+gulp.task('set-dev-node-env', function() {
+    return process.env.NODE_ENV = 'development';
 });
 
-// ================== Main working scope ==================
-gulp.task('aa-concat', () => {
-
-	return gulp.src(paths.jsfiles)
-		.pipe(sourcemaps.init())
-		.pipe(babel({
-			presets: ['es2015']
-		}))
-		.pipe(concat('concat.js'))
-		.pipe(gulp.dest(devRoot))
-		.pipe(rename('app-uglify.js'))
-		.pipe(uglify())
-		.pipe(sourcemaps.write())
-		.pipe(gulp.dest(prodRoot));
-
+gulp.task('set-prod-node-env', function() {
+    return process.env.NODE_ENV = 'production';
 });
 
-gulp.task('html:build', function() {
-	gulp.src('htmlsrc/*.html')
-		.pipe(rigger())
-		.pipe(gulp.dest("./"));
+gulp.task('lint', function() {
+  return gulp.src('./src/app/**/*.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'));
 });
 
-gulp.task('watch', () => {
-
-	browserSync.init({
-		server: {
-			baseDir: "./"
-		}
-	});
-
-	gulp.watch(paths.htmlfiles, ['html:build']);
-
-	gulp.watch(['*.html'])
-		.on('change', browserSync.reload);
-
-	gulp.watch(paths.jsfiles, ['aa-concat'])
-		.on('change', browserSync.reload);
-
-	gulp.watch(['style/**/*.scss', 'style/style.css'], ['sass'])
-		.on('change', browserSync.reload);
-
+gulp.task('scripts', function(){
+	return gulp.src(['./src/assets/**/*.js', configFile])
+			.pipe(uglify())
+			.pipe(concat('vendor.min.js'))
+			.pipe(gulp.dest('./public/'));
 });
 
-gulp.task('default', ['aa-concat'], () => {
+gulp.task('browserify', function() {
+    // Grabs the app.js file
+    return browserify('./src/app/app.js')
+        // bundles it and creates a file called main.js
+        .bundle()
+        .pipe(source('main.js'))
+        .pipe(gulp.dest('./public/'));
+})
+
+gulp.task('copy', ['browserify','scss'], function() {
+    gulp.src(['./src/**/*.html','./src/**/*.css'])
+        .pipe(gulp.dest('./public'))
+		.pipe(browserSync.stream())
 });
+
+gulp.task('scss', function() {
+    gulp.src('./src/assets/scss/*.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest('./src/assets/stylesheets/'));
+});
+
+gulp.task('build', ['lint', 'scss', 'copy', 'scripts'], function() {
+    if(production()) {
+        gulp.src(['./public/main.js'])
+            .pipe(uglify())
+            .pipe(rename({ suffix: '.min' }))
+            .pipe(gulp.dest('./public'));
+    }
+});
+
+gulp.task('browser-sync', ['build'], function() {
+    browserSync.init({
+        server: {
+            baseDir: "./public",
+			// The key is the url to match
+			// The value is which folder to serve (relative to your current working directory)
+			routes: {
+				"/bower_components": "bower_components",
+				"/node_modules": "node_modules"
+			}
+        },
+		browser: "chrome"
+    });
+});
+
+gulp.task('default', ['browser-sync'], function(){
+	gulp.watch("./src/**/*.*", ["build"]);
+	gulp.watch("./public/**/*.*").on('change', browserSync.reload);
+})

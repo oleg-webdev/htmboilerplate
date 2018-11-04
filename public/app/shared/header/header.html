@@ -1,0 +1,14 @@
+<!-- The top toolbar -->
+<md-toolbar class="md-primary">
+<div ng-controller="HeaderController" class="md-toolbar-tools">
+	<h2>
+		<span ng-click="clickHandler()">{{welcomeTextInfo}}</span>
+	</h2>
+	<md-button ui-sref="home">
+		Home
+	</md-button>
+	<md-button ui-sref="about">
+		About
+	</md-button>
+</div>
+</md-toolbar>
