@@ -5,6 +5,7 @@ require('angular-animate');
 require('angular-material');
 
 require('./services/UserFactory');
+require('./services/UserService');
 var AppHeader = require('./shared/header/header.js');
 require('./components/home/home.js');
 require('./components/about/about.js');
@@ -13,7 +14,7 @@ require('./partials/PartialHomeController');
 
 var app = angular.module('myApp', [
 	'ui.router','ngMaterial','myApp.home', 'myApp.about', AppHeader.name,
-	'myApp.partialhome', 'myApp.serv'
+	'myApp.partialhome', 'myApp.factory', 'myApp.service'
 ]);
 
 app.config(function($stateProvider, $urlRouterProvider) {

@@ -1,4 +1,4 @@
-angular.module('myApp.serv', [])
+angular.module('myApp.factory', [])
 		.factory('UserFactory', UserFactory);
 
 // UserFactory.$inject = ['$scope', '$state'];

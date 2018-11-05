@@ -89104,6 +89104,7 @@ require('angular-animate');
 require('angular-material');
 
 require('./services/UserFactory');
+require('./services/UserService');
 var AppHeader = require('./shared/header/header.js');
 require('./components/home/home.js');
 require('./components/about/about.js');
@@ -89112,7 +89113,7 @@ require('./partials/PartialHomeController');
 
 var app = angular.module('myApp', [
 	'ui.router','ngMaterial','myApp.home', 'myApp.about', AppHeader.name,
-	'myApp.partialhome', 'myApp.serv'
+	'myApp.partialhome', 'myApp.factory', 'myApp.service'
 ]);
 
 app.config(function($stateProvider, $urlRouterProvider) {
@@ -89158,7 +89159,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			}
 		});
 });
-},{"./components/about/about.js":85,"./components/home/home.js":86,"./partials/PartialHomeController":87,"./services/UserFactory":88,"./shared/header/header.js":89,"angular":83,"angular-animate":76,"angular-aria":78,"angular-material":80,"angular-ui-router":81}],85:[function(require,module,exports){
+},{"./components/about/about.js":85,"./components/home/home.js":86,"./partials/PartialHomeController":87,"./services/UserFactory":88,"./services/UserService":89,"./shared/header/header.js":90,"angular":83,"angular-animate":76,"angular-aria":78,"angular-material":80,"angular-ui-router":81}],85:[function(require,module,exports){
 angular.module('myApp.about', [])
 .controller('aboutCtrl', ['$state', function($state){
 	this.aboutText = 'about router';
@@ -89201,7 +89202,7 @@ function PartialHomeControllerParagraph($scope) {
 
 }
 },{}],88:[function(require,module,exports){
-angular.module('myApp.serv', [])
+angular.module('myApp.factory', [])
 		.factory('UserFactory', UserFactory);
 
 // UserFactory.$inject = ['$scope', '$state'];
@@ -89215,17 +89216,43 @@ function UserFactory() { //
   return UserData;
 }
 },{}],89:[function(require,module,exports){
+angular.module('myApp.service', [])
+		.service('UserService', UserService);
+
+// UserService.$inject = ['$scope', '$state'];
+function UserService() {
+
+  var that = this;
+  this.User = {name: '...'}
+
+  this.updateUser = function(cb) {
+    this.User = {
+      name: 'Alice name'
+    }
+
+    cb(that.User);
+  }
+
+}
+},{}],90:[function(require,module,exports){
 var AppHeader =  angular.module('myApp.header', []);
 AppHeader.controller('HeaderController', HeaderController);
 
-HeaderController.$inject = ['$scope', 'UserFactory'];
-function HeaderController($scope, UserFactory) {
+HeaderController.$inject = ['$scope', 'UserFactory', 'UserService'];
+function HeaderController($scope, UserFactory, UserService) {
 
   $scope.welcomeTextInfo = 'App title change';
+  $scope.e = UserFactory.name
 
   $scope.clickHandler = function clickHandler() {
     UserFactory.setName('Alice 2');
+
+    UserService.updateUser(function(user) {
+      console.log(user);
+    });
   };
+
+
 }
 
 module.exports = AppHeader;
